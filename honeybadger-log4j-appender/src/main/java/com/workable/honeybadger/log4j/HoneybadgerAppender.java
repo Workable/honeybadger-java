@@ -61,6 +61,7 @@ public class HoneybadgerAppender extends AppenderSkeleton {
 
         if (info != null) {
             Error error = new Error(getMessage(loggingEvent), loggingEvent.getThrowableInformation().getThrowable());
+            error.setReporter(loggingEvent.getLoggerName());
             client.reportError(error);
         }
     }
