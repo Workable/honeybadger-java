@@ -12,7 +12,20 @@
     </modules>
     <packaging>pom</packaging>
 
+    <scm>
+        <connection>scm:git:git://github.com/Workable/honeybadger-java.git</connection>
+        <url>http://github.com/Workable/honeybadger-java</url>
+    </scm>
+
     <build>
+        <extensions>
+            <extension>
+                <groupId>org.springframework.build</groupId>
+                <artifactId>aws-maven</artifactId>
+                <version>5.0.0.RELEASE</version>
+            </extension>
+        </extensions>
+
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -25,6 +38,20 @@
             </plugin>
         </plugins>
     </build>
+
+
+    <distributionManagement>
+        <repository>
+            <id>aws-release</id>
+            <name>AWS Release Repository</name>
+            <url>s3://workable-private-repo/release</url>
+        </repository>
+        <snapshotRepository>
+            <id>aws-snapshot</id>
+            <name>AWS Snapshot Repository</name>
+            <url>s3://workable-private-repo/snapshot</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 
 </project>
