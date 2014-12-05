@@ -82,7 +82,7 @@ public class JsonMarshaller {
         Throwable throwable = error.getError();
 
         JsonObject jsonError = new JsonObject();
-        jsonError.addProperty("class", String.join("-", error.getReporter(), throwable.getClass().getName()));
+        jsonError.addProperty("class", String.join(" - ", error.getReporter(), throwable.getClass().getName()));
         jsonError.addProperty("message", error.getMessage() == null ? throwable.getMessage() : error.getMessage());
 
         JsonArray backTrace = new JsonArray();
