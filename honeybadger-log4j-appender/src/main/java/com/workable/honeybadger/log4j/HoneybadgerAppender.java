@@ -35,7 +35,7 @@ public class HoneybadgerAppender extends AppenderSkeleton {
     /**
      * If <code>true</code> erros are dispatched asynchronously (Default true)
      */
-    private boolean async;
+    private boolean async = true;
 
     /**
      * Max threads for asynchronous error dispatching. (Default number of processors)

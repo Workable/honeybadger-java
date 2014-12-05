@@ -56,7 +56,7 @@ public class HoneybadgerClient {
         "https://api.honeybadger.io/v1/notices";
 
     /**
-     * If <code>true</code> erros are dispatched asynchronously (Default true)
+     * If <code>true</code> errors are dispatched asynchronously (Default true)
      */
     private boolean async;
 
