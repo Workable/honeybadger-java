@@ -4,7 +4,7 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-import com.workable.honeybadger.servlet.HttpServletRequestInfoGenerator;
+import com.workable.honeybadger.servlet .HttpServletRequestInfoGenerator;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,7 +84,7 @@ public class JsonMarshaller {
         Throwable throwable = error.getError();
 
         JsonObject jsonError = new JsonObject();
-        jsonError.addProperty("class", String.join(" - ", error.getReporter(), throwable.getClass().getName()));
+        jsonError.addProperty("class", error.getReporter() + " - " + throwable.getClass().getName());
         jsonError.addProperty("message", error.getMessage() == null ? throwable.getMessage() : error.getMessage());
 
         JsonArray backTrace = new JsonArray();
