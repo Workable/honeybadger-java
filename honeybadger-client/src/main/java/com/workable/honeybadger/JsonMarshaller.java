@@ -51,10 +51,9 @@ public class JsonMarshaller {
         jsonError.add("notifier", makeNotifier());
         jsonError.add("error", makeError(error));
 
-        if (error.getContext() != null) {
-            JsonObject request = makeRequest(error.getContext());
-            jsonError.add("request", request);
-        }
+        JsonObject request = makeRequest(error.getContext());
+        request.add("context", context);
+        jsonError.add("request", request);
 
         jsonError.add("server", makeServer());
 
@@ -64,7 +63,7 @@ public class JsonMarshaller {
     private JsonObject makeRequest(Object request) {
 
         if (request == null){
-            return null;
+            return new JsonObject();
         }
         try {
             Class.forName("javax.servlet.http.HttpServletRequest");

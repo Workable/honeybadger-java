@@ -1,11 +1,6 @@
 package com.workable.honeybadger;
 
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpVersion;
-import org.apache.http.client.fluent.Request;
-import org.apache.http.client.fluent.Response;
-import org.apache.http.entity.ContentType;
+import org.glassfish.jersey.client.ClientConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +14,12 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingDeque;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+
+import javax.ws.rs.client.Client;
+import javax.ws.rs.client.ClientBuilder;
+import javax.ws.rs.client.Entity;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 /**
  * Facade giving a simple interface for sending error to the Honeybadger API
@@ -58,22 +59,22 @@ public class HoneybadgerClient {
     /**
      * If <code>true</code> errors are dispatched asynchronously (Default true)
      */
-    private boolean async;
+    private boolean async = true;
 
     /**
-     * Max threads for asynchronous error dispatching. (Default number of processors)
+     * Max threads for asynchronous error dispatching. (Default: one)
      */
-    private int maxThreads;
+    private int maxThreads = 1;
 
     /**
      * The thread priority of the asynchronous thread dispatchers. (Default Thread.MIN)
      */
-    private int priority;
+    private int priority = Thread.MIN_PRIORITY;
 
     /**
      * The queue size of the asynchronous dispatching mechanism (Default: Integer.MAX)
      */
-    private int queueSize;
+    private int queueSize = Integer.MAX_VALUE;
 
 
     /**
@@ -180,9 +181,7 @@ public class HoneybadgerClient {
         for (int retries = 0; retries < 3; retries++) {
             try {
                 String json = marshaller.marshall(error);
-                HttpResponse response = sendToHoneybadger(json)
-                    .returnResponse();
-                int responseCode = response.getStatusLine().getStatusCode();
+                int responseCode = sendToHoneybadger(json).getStatus();
 
                 if (responseCode != 201) {
                     logger.error("Honeybadger did not respond with the " +
@@ -191,12 +190,13 @@ public class HoneybadgerClient {
                 } else {
                     logger.debug("Honeybadger logged error correctly: {}",
                                  error);
+                    return;
                 }
             } catch (IOException e) {
                 String msg = String.format("There was an error when trying " +
                                            "to send the error to " +
                                            "Honeybadger. Retries=%d", retries);
-                logger.error(msg, e);
+                logger.error(msg, new HoneybadgerException(e));
 
             }
         }
@@ -212,37 +212,15 @@ public class HoneybadgerClient {
      */
     private Response sendToHoneybadger(String jsonError) throws IOException {
         URI honeybadgerUrl = honeybadgerUrl();
-        Request request = buildRequest(honeybadgerUrl, jsonError);
-        Response response = request.execute();
 
-        return response;
-    }
+        Client client = ClientBuilder.newClient(new ClientConfig());
 
-    /**
-     * Builds a Apache HTTP Client request object configured for calling the Honeybadger API.
-     *
-     * @param honeybadgerUrl Endpoint location
-     * @param jsonError      Error JSON payload
-     * @return a configured request object
-     */
-    private Request buildRequest(URI honeybadgerUrl, String jsonError) {
-
-        Request request = Request
-            .Post(honeybadgerUrl)
-            .addHeader("X-API-Key", apiKey)
-            .addHeader("Accept", "application/json")
-            .version(HttpVersion.HTTP_1_1)
-            .bodyString(jsonError, ContentType.APPLICATION_JSON);
-
-        if (System.getProperty("http.proxyHost") != null) {
-            int port = Integer.parseInt(System.getProperty("http.proxyPort"));
-            HttpHost proxy = new HttpHost(System.getProperty("http.proxyHost"),
-                                          port);
-
-            request.viaProxy(proxy);
-        }
-
-        return request;
+        return client
+            .target(honeybadgerUrl)
+            .request()
+            .accept(MediaType.APPLICATION_JSON)
+            .header("X-API-Key", apiKey)
+            .post(Entity.entity(jsonError, MediaType.APPLICATION_JSON));
     }
 
 
@@ -330,6 +308,8 @@ public class HoneybadgerClient {
     private Set<String> buildExcludedExceptionClasses(String excluded) {
         HashSet<String> set = new HashSet<>();
 
+        set.add(HoneybadgerException.class.getCanonicalName());
+
         if (excluded == null || excluded.isEmpty()) {
             return set;
         }
@@ -358,7 +338,7 @@ public class HoneybadgerClient {
             try {
                 doDispatchError(error);
             } catch (Exception e) {
-                logger.error("An exception occurred while dispatching the error", e);
+                logger.error("An exception occurred while dispatching the error", new HoneybadgerException(e));
             }
         }
     }

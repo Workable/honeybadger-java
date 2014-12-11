@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/">
+
+	<appender name="honeybadger" class="com.workable.honeybadger.log4j.HoneybadgerAppender">
+		<param name="Threshold" value="ERROR" />
+		<param name="apiKey" value="ff4f4866" />
+		<!--<param name="maxThreads" value="1" />-->
+		<!--<param name="queueSize" value="50000" />-->
+		<!--<param name="priority" value="1" />-->
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="[%-5p] %c - %m%n%throwable{none}" />
+		</layout>
+	</appender>
+
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{yyyy-MM-dd HH:mm:ss} %-5p %c{1} %m %X%n" />
+		</layout>
+	</appender>
+
+	<logger name="com.workable">
+		<level value="DEBUG"/> 
+	</logger>
+
+	<root>
+ 		<level value="INFO" />
+		<appender-ref ref="honeybadger" />
+		<appender-ref ref="console" />
+	</root>
+	
+</log4j:configuration>
