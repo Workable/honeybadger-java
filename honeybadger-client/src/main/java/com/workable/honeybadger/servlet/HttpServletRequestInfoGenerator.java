@@ -32,6 +32,9 @@ public class HttpServletRequestInfoGenerator
 
     @Override
     public JsonObject routeRequest(Object requestSource) {
+        if (requestSource == null){
+            return new JsonObject();
+        }
         if (!(requestSource instanceof HttpServletRequest)) {
             throw new HoneybadgerException("Request object is not instance " +
                                            "of HttpServletRequest");

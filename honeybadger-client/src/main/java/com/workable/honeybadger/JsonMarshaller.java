@@ -43,18 +43,16 @@ public class JsonMarshaller {
 
     public String marshall(Error error) {
 
-        JsonObject request = makeRequest(error.getContext());
-
         JsonObject context = new JsonObject();
         context.add("mdc", mdcProperties());
-        request.add("context", context);
 
         Gson myGson = new Gson();
         JsonObject jsonError = new JsonObject();
         jsonError.add("notifier", makeNotifier());
         jsonError.add("error", makeError(error));
 
-        if (request != null) {
+        if (error.getContext() != null) {
+            JsonObject request = makeRequest(error.getContext());
             jsonError.add("request", request);
         }
 
@@ -63,7 +61,11 @@ public class JsonMarshaller {
         return myGson.toJson(jsonError);
     }
 
-    public JsonObject makeRequest(Object request) {
+    private JsonObject makeRequest(Object request) {
+
+        if (request == null){
+            return null;
+        }
         try {
             Class.forName("javax.servlet.http.HttpServletRequest");
             RequestInfoGenerator<?> generator =
