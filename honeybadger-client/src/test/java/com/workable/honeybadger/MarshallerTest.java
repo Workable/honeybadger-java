@@ -34,8 +34,8 @@ public class MarshallerTest {
         HoneybadgerError map = gson.fromJson(result, HoneybadgerError.class);
 
         Map<String, Object> errorMap = map.getError();
-        
 
+        //TODO add assertions
 
     }
 

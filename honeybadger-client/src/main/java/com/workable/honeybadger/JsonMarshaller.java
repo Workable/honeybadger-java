@@ -43,16 +43,13 @@ public class JsonMarshaller {
 
     public String marshall(Error error) {
 
-        JsonObject context = new JsonObject();
-        context.add("mdc", mdcProperties());
-
         Gson myGson = new Gson();
         JsonObject jsonError = new JsonObject();
         jsonError.add("notifier", makeNotifier());
         jsonError.add("error", makeError(error));
 
         JsonObject request = makeRequest(error.getContext());
-        request.add("context", context);
+        request.add("context", context());
         jsonError.add("request", request);
 
         jsonError.add("server", makeServer());
@@ -150,19 +147,19 @@ public class JsonMarshaller {
         return jsonServer;
     }
 
-    private JsonObject mdcProperties() {
-        JsonObject jsonMdc = new JsonObject();
+    private JsonObject context() {
+        JsonObject context = new JsonObject();
 
         @SuppressWarnings("unchecked")
         Map<String, String> mdc = MDC.getCopyOfContextMap();
 
         if (mdc != null) {
             for (Map.Entry<String, String> entry : mdc.entrySet()) {
-                jsonMdc.addProperty(entry.getKey(), entry.getValue());
+                context.addProperty(entry.getKey(), entry.getValue());
             }
         }
 
-        return jsonMdc;
+        return context;
     }
 
     private JsonObject systemProperties() {
