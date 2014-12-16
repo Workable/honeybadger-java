@@ -15,6 +15,22 @@ public class AppenderIT {
         Buggy buggy = new Buggy();
         buggy.fail();
     }
+
+
+    @Test
+    public void testNestedException() throws Exception {
+
+        try {
+            Delegate delegate = new Delegate();
+            delegate.run();
+        }
+        catch(Exception e){
+            log.error("Exception while runing", e);
+        }
+
+
+    }
+
     @Test
     public void shouldLogError2() throws Exception {
 
@@ -26,7 +42,8 @@ public class AppenderIT {
     @Test
     public void shouldLogErrorWithMDC() throws Exception {
         MDC.put("MDC Entry", "MDC Value");
-        log.error("This is an error with MDC", new UnsupportedOperationException("Something went wrong..."));
+
+        log.error("This is an error with MDC", new UnsupportedOperationException("Something went wrong...", new NullPointerException()));
     }
 
     private class Buggy {
@@ -35,6 +52,25 @@ public class AppenderIT {
 
         public void fail(){
             log.error("Error from buggy", new IllegalStateException("From buggy"));
+        }
+    }
+
+    private class Delegate{
+
+        public void run(){
+            try {
+                Failer failer = new Failer();
+                failer.fail();
+            }
+            catch (Exception e){
+                throw new IllegalStateException("Error while running", e);
+            }
+        }
+    }
+    private class Failer {
+
+        public void fail(){
+            throw new NullPointerException("Point to null");
         }
     }
 

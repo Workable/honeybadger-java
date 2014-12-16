@@ -84,15 +84,14 @@ public class JsonMarshaller {
         jsonError.addProperty("message", error.getMessage() == null ? throwable.getMessage() : error.getMessage());
 
         JsonArray backTrace = new JsonArray();
-        for (StackTraceElement trace : throwable.getStackTrace()) {
-            JsonObject jsonTraceElement = new JsonObject();
-            jsonTraceElement.addProperty("number", trace.getLineNumber());
-            jsonTraceElement.addProperty("file", trace.getFileName());
-            jsonTraceElement.addProperty("method",
-                                         String.format("%s.%s",
-                                                       trace.getClassName(), trace.getMethodName()));
-            backTrace.add(jsonTraceElement);
+        populateTraceElements(throwable, backTrace, false);
+
+        if (throwable.getCause() != null){
+            JsonObject causedByElement = traceElement(0, "Caused by: " + throwable.getCause().getClass().getName() + ": " + throwable.getCause().getMessage(), ".");
+            backTrace.add(causedByElement);
+            populateTraceElements(throwable.getCause(), backTrace, true);
         }
+
         jsonError.add("backtrace", backTrace);
 
         JsonObject sourceElement = new JsonObject();
@@ -102,6 +101,37 @@ public class JsonMarshaller {
         jsonError.add("source", sourceElement);
 
         return jsonError;
+    }
+
+    private void populateTraceElements(Throwable throwable, JsonArray backTrace, boolean cause){
+
+        int count = 0;
+        for (StackTraceElement trace : throwable.getStackTrace()) {
+
+            String fileName = (cause ? "  " : "") + trace.getFileName();
+            JsonObject jsonTraceElement = traceElement(trace.getLineNumber(),
+                                                       fileName,
+                                                       String.format("%s.%s",trace.getClassName(), trace.getMethodName()));
+            if (cause && ++count == 3){
+                backTrace.add(traceElement(0, String.format("... %d more", throwable.getStackTrace().length - count), "." ));
+                break;
+            }
+            backTrace.add(jsonTraceElement);
+        }
+    }
+
+    private JsonObject traceElement(int line, String file, String method){
+        JsonObject jsonTraceElement = new JsonObject();
+        if (line > 0){
+            jsonTraceElement.addProperty("number", line);
+        }
+        if (file != null){
+            jsonTraceElement.addProperty("file", file);
+        }
+        if (method != null){
+            jsonTraceElement.addProperty("method", method);
+        }
+        return jsonTraceElement;
     }
 
     /*
