@@ -1,6 +1,10 @@
 language: java
 jdk:
-  - oraclejdk8
-  - oraclejdk7
-  - openjdk8
-  - openjdk7
+- oraclejdk8
+- oraclejdk7
+- openjdk7
+env:
+  global:
+  - secure: G+H6I6IR4hAM98OjveVY5Oa9A2wV3TR/DZkHW2/Jlft/02hF4taTZUd30ehNDB2PMRnw3/90rux5DUNT3qbh/bQAgD4Vbed9ABWGMyoqapImMTKgS3HSWHSiIBIx40nMzMWriVnKVrNw7lRMwTfqH29MlUl97vxFNeFBcLVG6xk=
+  - secure: VvJAYD/Jt1mb0eg3/MBfIJPSZdPnXaE7XEzTN9tEe8nKN4IvGwaR2pXh1z8cyni9iMysGoUJJEhuC1IABk/psYyRbbNUo8t5DjR9OtnTcNzLYbctH5+uq1QmgiJjOG8I6/BubiKbqFzfX8u3u7Aec5N1YcNuuTkmAgmkbS+zPlE=
+script: "mvn clean deploy --settings settings.xml"
