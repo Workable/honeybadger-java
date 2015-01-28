@@ -47,29 +47,31 @@ public class JsonMarshaller {
         JsonObject jsonError = new JsonObject();
         jsonError.add("notifier", makeNotifier());
         jsonError.add("error", makeError(error));
-
-        JsonObject request = makeRequest(error.getContext());
-        request.add("context", context());
-        jsonError.add("request", request);
+        jsonError.add("request", makeRequest(error));
 
         jsonError.add("server", makeServer());
 
         return myGson.toJson(jsonError);
     }
 
-    private JsonObject makeRequest(Object request) {
+    private JsonObject makeRequest(Error error) {
 
-        if (request == null){
-            return new JsonObject();
-        }
+        JsonObject request = new JsonObject();
+
         try {
             Class.forName("javax.servlet.http.HttpServletRequest");
             RequestInfoGenerator<?> generator =
                 new HttpServletRequestInfoGenerator();
-            return generator.routeRequest(request);
+            request = generator.routeRequest(error.getContext());
         } catch (ClassNotFoundException e) {
-            return new JsonObject();
+            // silent catch
         }
+
+        request.add("context", context());
+        request.addProperty("component", error.getReporter());
+        request.addProperty("action", methodName(error.getError()));
+
+        return request;
     }
 
     /*
@@ -80,7 +82,7 @@ public class JsonMarshaller {
         Throwable throwable = error.getError();
 
         JsonObject jsonError = new JsonObject();
-        jsonError.addProperty("class", error.getReporter() + " - " + throwable.getClass().getName());
+        jsonError.addProperty("class", throwable.getClass().getName());
         jsonError.addProperty("message", error.getMessage() == null ? throwable.getMessage() : error.getMessage());
 
         JsonArray backTrace = new JsonArray();
@@ -120,6 +122,13 @@ public class JsonMarshaller {
         }
     }
 
+    private String methodName(Throwable throwable){
+        if (throwable == null){
+            return null;
+        }
+        return throwable.getStackTrace()[0].getMethodName();
+    }
+
     private JsonObject traceElement(int line, String file, String method){
         JsonObject jsonTraceElement = new JsonObject();
         if (line > 0){
@@ -139,7 +148,7 @@ public class JsonMarshaller {
     */
     private JsonObject makeNotifier() {
         JsonObject notifier = new JsonObject();
-        notifier.addProperty("name", "honeybadger-jvm-client-v2");
+        notifier.addProperty("name", "workable-honeybadger-java");
         notifier.addProperty("version", "1.3.0");
         return notifier;
     }
