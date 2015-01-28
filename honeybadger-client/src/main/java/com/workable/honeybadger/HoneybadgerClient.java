@@ -189,7 +189,7 @@ public class HoneybadgerClient {
                                  responseCode, retries);
                 } else {
                     logger.debug("Honeybadger logged error correctly: {}",
-                                 error);
+                            json);
                     return;
                 }
             } catch (IOException e) {
