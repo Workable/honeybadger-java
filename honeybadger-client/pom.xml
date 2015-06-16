@@ -5,11 +5,13 @@
     <parent>
         <artifactId>honeybadger-java</artifactId>
         <groupId>com.workable.honeybadger</groupId>
-        <version>1.0</version>
+        <version>1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
 
     <artifactId>honeybadger-client</artifactId>
+    <name>Honeybadger :: Java :: Client</name>
+    <description>Honeybadger Client</description>
 
     <dependencies>
         <dependency>
@@ -28,16 +30,10 @@
             <artifactId>slf4j-api</artifactId>
             <version>1.7.7</version>
         </dependency>
-
         <dependency>
-            <groupId>org.glassfish.jersey.core</groupId>
-            <artifactId>jersey-client</artifactId>
-            <version>${org.glassfish.jersey.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.glassfish.jersey.connectors</groupId>
-            <artifactId>jersey-apache-connector</artifactId>
-            <version>${org.glassfish.jersey.version}</version>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.3.4</version>
         </dependency>
 
         <!-- Test Dependencies -->

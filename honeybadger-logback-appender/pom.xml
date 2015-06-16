@@ -8,12 +8,15 @@
         <version>1.1</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-    <artifactId>honeybadger-log4j-appender</artifactId>
-    <name>Honeybadger :: Java :: Log4j Appender</name>
-    <description>Log4j appender allowing to send logs to Honeybadger.</description>
+
+    <artifactId>honeybadger-logback-appender</artifactId>
+    <name>Honeybadger :: Java :: Logback Appender</name>
+    <description>Logback appender allowing to send logs to Honeybadger.</description>
 
     <properties>
         <log4j.version>1.2.17</log4j.version>
+        <guava.version>18.0</guava.version>
+        <logback.version>1.1.2</logback.version>
     </properties>
 
     <dependencies>
@@ -23,15 +26,21 @@
             <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>${log4j.version}</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>${logback.version}</version>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-log4j12</artifactId>
-            <version>1.7.7</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-core</artifactId>
+            <version>${logback.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+            <version>${guava.version}</version>
+        </dependency>
+
 
         <!-- Test Dependencies -->
         <dependency>
@@ -40,5 +49,6 @@
             <version>4.11</version>
         </dependency>
     </dependencies>
+
 
 </project>
