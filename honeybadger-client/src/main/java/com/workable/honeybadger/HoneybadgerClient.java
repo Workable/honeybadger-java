@@ -4,7 +4,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
 import org.slf4j.Logger;
@@ -210,7 +210,7 @@ public class HoneybadgerClient {
      */
     private HttpResponse sendToHoneybadger(String jsonError) throws IOException {
 
-        HttpClient client = HttpClientBuilder.create().build();
+        HttpClient client = new DefaultHttpClient();
         HttpPost post = new HttpPost(honeybadgerUrl());
         StringEntity entity = new StringEntity(jsonError);
         entity.setContentType(new BasicHeader("Content-Type", "application/json"));
