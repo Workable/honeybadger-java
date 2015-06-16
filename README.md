@@ -84,3 +84,30 @@ log4j.appender.ConsoleAppender=org.apache.log4j.ConsoleAppender
 log4j.appender.ConsoleAppender.layout=org.apache.log4j.EnhancedPatternLayout
 log4j.appender.ConsoleAppender.layout.ConversionPattern=[WORKABLE] [%-5p] %c - %m%n%throwable{none}
 ```
+### Logback
+A typical logback.xml may look like:
+
+```xml
+<configuration>
+    <appender name="honeybadger" class="com.workable.honeybadger.logback.HoneybadgerAppender">
+        <param name="Threshold" value="ERROR" />
+        <param name="apiKey" value="xxxxxx" />
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+    <logger name="com.workable">
+        <level value="DEBUG"/>
+    </logger>
+    <root>
+        <level value="INFO" />
+        <appender-ref ref="honeybadger" />
+        <appender-ref ref="console" />
+    </root>
+</configuration>
+```
