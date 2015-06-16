@@ -5,10 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.workable.honeybadger</groupId>
     <artifactId>honeybadger-java</artifactId>
-    <version>1.0</version>
+    <version>1.1-SNAPSHOT</version>
+    <name>Honeybadger :: Java</name>
     <modules>
         <module>honeybadger-client</module>
         <module>honeybadger-log4j-appender</module>
+        <module>honeybadger-logback-appender</module>
     </modules>
     <packaging>pom</packaging>
 

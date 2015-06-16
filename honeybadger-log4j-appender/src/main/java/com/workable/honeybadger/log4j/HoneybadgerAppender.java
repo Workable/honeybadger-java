@@ -15,7 +15,7 @@ public class HoneybadgerAppender extends AppenderSkeleton {
     /**
      * The client to send errors to Honeybadger
      */
-    private HoneybadgerClient client;
+    private volatile HoneybadgerClient client;
 
     /**
      * The Honebadger API Key. Cannot be null
