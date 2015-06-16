@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+
+    <appender name="honeybadger" class="com.workable.honeybadger.logback.HoneybadgerAppender">
+        <param name="Threshold" value="ERROR" />
+        <param name="apiKey" value="2b9b6c46" />
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="console" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%-4relative [%thread] %-5level %logger{35} - %msg %n</pattern>
+        </encoder>
+    </appender>
+
+    <logger name="com.workable">
+        <level value="DEBUG"/>
+    </logger>
+
+    <root>
+        <level value="INFO" />
+        <appender-ref ref="honeybadger" />
+        <appender-ref ref="console" />
+    </root>
+
+</configuration>

@@ -1,6 +1,12 @@
 package com.workable.honeybadger;
 
-import org.glassfish.jersey.client.ClientConfig;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.http.message.BasicHeader;
+import org.apache.http.protocol.BasicHttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -9,17 +15,7 @@ import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.BlockingDeque;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.LinkedBlockingDeque;
-import java.util.concurrent.ThreadPoolExecutor;
-import java.util.concurrent.TimeUnit;
-
-import javax.ws.rs.client.Client;
-import javax.ws.rs.client.ClientBuilder;
-import javax.ws.rs.client.Entity;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
+import java.util.concurrent.*;
 
 /**
  * Facade giving a simple interface for sending error to the Honeybadger API
@@ -181,7 +177,9 @@ public class HoneybadgerClient {
         for (int retries = 0; retries < 3; retries++) {
             try {
                 String json = marshaller.marshall(error);
-                int responseCode = sendToHoneybadger(json).getStatus();
+                HttpResponse response = sendToHoneybadger(json);
+
+                int responseCode = response.getStatusLine().getStatusCode();
 
                 if (responseCode != 201) {
                     logger.error("Honeybadger did not respond with the " +
@@ -210,17 +208,15 @@ public class HoneybadgerClient {
      * @return Status code from the Honeybadger API
      * @throws IOException thrown when a network was encountered
      */
-    private Response sendToHoneybadger(String jsonError) throws IOException {
-        URI honeybadgerUrl = honeybadgerUrl();
+    private HttpResponse sendToHoneybadger(String jsonError) throws IOException {
 
-        Client client = ClientBuilder.newClient(new ClientConfig());
-
-        return client
-            .target(honeybadgerUrl)
-            .request()
-            .accept(MediaType.APPLICATION_JSON)
-            .header("X-API-Key", apiKey)
-            .post(Entity.entity(jsonError, MediaType.APPLICATION_JSON));
+        HttpClient client = HttpClientBuilder.create().build();
+        HttpPost post = new HttpPost(honeybadgerUrl());
+        StringEntity entity = new StringEntity(jsonError);
+        entity.setContentType(new BasicHeader("Content-Type", "application/json"));
+        post.setEntity(entity);
+        post.setHeader("X-API-Key", apiKey);
+        return client.execute(post, new BasicHttpContext());
     }
 
 
