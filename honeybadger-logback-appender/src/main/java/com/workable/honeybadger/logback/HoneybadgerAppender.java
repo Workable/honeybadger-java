@@ -61,8 +61,6 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
 
     /**
      * Creates an instance of HoneybadgerAppender.
-     *
-     * @param instance of Honeybadger to use with this appender.
      */
     public HoneybadgerAppender(HoneybadgerClient client, String apiKey, String ignoredExceptions, String ignoredSystemProperties,
                                boolean async, int maxThreads, int priority, int queueSize) {
@@ -80,7 +78,7 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
      * {@inheritDoc}
      * <p>
      * The honeybadger instance is started in this method instead of {@link #start()} in order to avoid substitute loggers
-     * being generated during the instantiation of {@link Honeybadger}.<br>
+     * being generated during the instantiation of Honeybadger.<br>
      * More on <a href="http://www.slf4j.org/codes.html#substituteLogger">www.slf4j.org/codes.html#substituteLogger</a>
      */
     @Override
