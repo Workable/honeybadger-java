@@ -123,7 +123,7 @@ public class JsonMarshaller {
     }
 
     private String methodName(Throwable throwable){
-        if (throwable == null){
+        if (throwable == null || throwable.getStackTrace() == null || throwable.getStackTrace().length == 0){
             return null;
         }
         return throwable.getStackTrace()[0].getMethodName();
