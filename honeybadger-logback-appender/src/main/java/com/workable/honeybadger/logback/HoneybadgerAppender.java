@@ -3,9 +3,10 @@ package com.workable.honeybadger.logback;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
+import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.AppenderBase;
-import com.workable.honeybadger.*;
 import com.workable.honeybadger.Error;
+import com.workable.honeybadger.HoneybadgerClient;
 
 
 /**
@@ -87,9 +88,9 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
         try {
             IThrowableProxy info = iLoggingEvent.getThrowableProxy();
             if (info != null) {
-                Throwable throwable = new Throwable(iLoggingEvent.getMessage());
-                throwable.setStackTrace(toStackTraceElements(iLoggingEvent.getThrowableProxy()));
-                Error error = new Error(iLoggingEvent.getFormattedMessage(),throwable);
+                final ThrowableProxy throwableProxyImpl =
+                        (ThrowableProxy) info;
+                Error error = new Error(iLoggingEvent.getFormattedMessage(),throwableProxyImpl.getThrowable());
                 error.setReporter(iLoggingEvent.getLoggerName());
                 client.reportError(error);
             }
