@@ -167,10 +167,7 @@ public class HoneybadgerClient {
      * Marshals and dispatched the specified error to the Honeybadger
      */
     protected void doDispatchError(Error error) {
-
-        final String errorClassName = error.getClass().getName();
-        if (errorClassName != null &&
-            excludedExceptionClasses.contains(errorClassName)) {
+        if (shouldExclude(error)) {
             return;
         }
 
@@ -198,6 +195,26 @@ public class HoneybadgerClient {
 
             }
         }
+    }
+
+    /**
+     * Checks if the Exception should be excluded or not
+     * @param error
+     * @return
+     */
+    private boolean shouldExclude(Error error){
+
+        String errorClassName = error.getClass().getName();
+
+        if (errorClassName != null){
+            for (String className : excludedExceptionClasses){
+                if (errorClassName.startsWith(className)){
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 
@@ -311,7 +328,7 @@ public class HoneybadgerClient {
         }
 
         for (String item : excluded.split(",")) {
-            set.add(item);
+            set.add(item.trim());
         }
 
         return set;
