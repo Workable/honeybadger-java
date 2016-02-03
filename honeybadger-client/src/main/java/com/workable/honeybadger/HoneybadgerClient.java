@@ -183,7 +183,7 @@ public class HoneybadgerClient {
                                  "correct code. Response was [{}]. Retries={}",
                                  responseCode, retries);
                 } else {
-                    logger.debug("Honeybadger logged error correctly: {}",
+                    logger.trace("Honeybadger logged error correctly: {}",
                             json);
                     return;
                 }
