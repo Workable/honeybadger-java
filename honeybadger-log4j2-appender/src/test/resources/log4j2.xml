@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration status="INFO" name="ripatron-config">
+    <Properties>
+        <Property name="PATTERN">[%-5p] %c - %m%n%throwable{none}</Property>
+    </Properties>
+    <Appenders>
+        <Console name="console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${PATTERN}"/>
+        </Console>
+        <HoneyBadgerAppender name="honeybadger" apiKey="2b9b6c46">
+            <PatternLayout pattern="${PATTERN}"/>
+        </HoneyBadgerAppender>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="console" level="DEBUG"/>
+            <AppenderRef ref="honeybadger" level="ERROR"/>
+        </Root>
+    </Loggers>
+</Configuration>
