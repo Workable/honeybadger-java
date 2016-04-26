@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.workable.honeybadger</groupId>
     <artifactId>honeybadger-java</artifactId>
-    <version>1.5.1</version>
+    <version>1.5.2</version>
     <name>Honeybadger :: Java</name>
     <description>Honeybadger Java parent project.</description>
     <url>https://github.com/Workable/honeybadger-java/wiki</url>
