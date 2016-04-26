@@ -167,7 +167,7 @@ public class HoneybadgerClient {
      * Marshals and dispatched the specified error to the Honeybadger
      */
     protected void doDispatchError(Error error) {
-        if (shouldExclude(error)) {
+        if (shouldExclude(error.getError())) {
             return;
         }
 
@@ -202,7 +202,11 @@ public class HoneybadgerClient {
      * @param error
      * @return
      */
-    private boolean shouldExclude(Error error){
+    private boolean shouldExclude(Throwable error){
+
+        if (error == null){
+            return false;
+        }
 
         String errorClassName = error.getClass().getName();
 
