@@ -1,3 +1,4 @@
+import com.workable.honeybadger.HoneybadgerException;
 import org.apache.log4j.MDC;
 import org.junit.Test;
 
@@ -37,6 +38,11 @@ public class AppenderIT {
         for (int i = 0; i < 25; i++){
             log.error("This is an error" + i, new IllegalStateException("Oups" + i));
         }
+    }
+
+    @Test
+    public void shouldExcludeHoneybadgerException() throws Exception {
+        log.error("This is an error", new HoneybadgerException("Oups"));
     }
 
     @Test
