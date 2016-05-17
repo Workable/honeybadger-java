@@ -9,11 +9,13 @@ import org.apache.http.message.BasicHeader;
 import org.apache.http.protocol.BasicHttpContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 import java.io.IOException;
 import java.net.URI;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.*;
 
@@ -338,24 +340,37 @@ public class HoneybadgerClient {
         return set;
     }
 
-
     /**
      * Runnable to dispatch asynchronously errors
      */
     private final class EventDispatcher implements Runnable {
 
         private final Error error;
+        private final Map<String, String> context;
 
         public EventDispatcher(Error error) {
             this.error = error;
+            this.context = MDC.getCopyOfContextMap();;
         }
 
         @Override
         public void run() {
+            Map<String, String> previous = MDC.getCopyOfContextMap();
+            setMdcContext(context);
             try {
                 doDispatchError(error);
             } catch (Exception e) {
                 logger.error("An exception occurred while dispatching the error", new HoneybadgerException(e));
+            } finally {
+                setMdcContext(previous);
+            }
+        }
+
+        private void setMdcContext(Map<String, String> context) {
+            if (context == null) {
+                MDC.clear();
+            } else {
+                MDC.setContextMap(context);
             }
         }
     }
