@@ -33,6 +33,11 @@ public class HoneybadgerAppender extends AppenderSkeleton {
     private String ignoredExceptions;
 
     /**
+     * Comma delimited list of classes or packages that cause Exceptions that should be ignored
+     */
+    private String ignoredCauses;
+
+    /**
      * If <code>true</code> erros are dispatched asynchronously (Default true)
      */
     private boolean async = true;
@@ -70,7 +75,7 @@ public class HoneybadgerAppender extends AppenderSkeleton {
     public void activateOptions() {
         super.activateOptions();
         if (client == null) {
-            client = new HoneybadgerClient(apiKey, ignoredSystemProperties, ignoredExceptions);
+            client = new HoneybadgerClient(apiKey, ignoredSystemProperties, ignoredExceptions, ignoredCauses);
             client.setAsync(async);
             client.setMaxThreads(maxThreads);
             client.setPriority(priority);
@@ -98,6 +103,10 @@ public class HoneybadgerAppender extends AppenderSkeleton {
 
     public void setIgnoredExceptions(String ignoredExceptions) {
         this.ignoredExceptions = ignoredExceptions;
+    }
+
+    public void setIgnoredCauses(String ignoredCauses) {
+        this.ignoredCauses = ignoredCauses;
     }
 
     public void setAsync(boolean async) {
