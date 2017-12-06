@@ -17,7 +17,11 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.*;
+import java.util.concurrent.BlockingDeque;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * Facade giving a simple interface for sending error to the Honeybadger API
@@ -43,10 +47,16 @@ public class HoneybadgerClient {
         "honeybadger.excluded_sys_props";
 
     /**
+     * Comma delimited list of packages or classes that throw exceptions to ignore.
+     */
+    public static final String HONEYBADGER_EXCLUDED_CAUSES_SYS_PROP_KEY =
+        "honeybadger.excluded_exception_causes";
+
+    /**
      * Comma delimited list of exception classes to ignore.
      */
     public static final String HONEYBADGER_EXCLUDED_CLASSES_SYS_PROP_KEY =
-        "honeybadger.excluded_exception_classes";
+            "honeybadger.excluded_exception_classes";
 
     /**
      * The default Honebadger URL
@@ -83,6 +93,7 @@ public class HoneybadgerClient {
     private final String apiKey;
 
     private final Set<String> excludedExceptionClasses;
+    private final Set<String> excludedExceptionCauses;
 
     private final JsonMarshaller marshaller;
 
@@ -105,7 +116,8 @@ public class HoneybadgerClient {
      */
     public HoneybadgerClient(String apiKey) {
         this(apiKey, System.getProperty(HONEYBADGER_EXCLUDED_PROPS_SYS_PROP_KEY),
-             System.getProperty(HONEYBADGER_EXCLUDED_CLASSES_SYS_PROP_KEY));
+             System.getProperty(HONEYBADGER_EXCLUDED_CLASSES_SYS_PROP_KEY),
+                System.getProperty(HONEYBADGER_EXCLUDED_CAUSES_SYS_PROP_KEY));
     }
 
     /**
@@ -116,9 +128,10 @@ public class HoneybadgerClient {
      *                                 dispatched
      * @param excludedExceptionClasses Comma delimited list of Exceptions that should be ignored
      */
-    public HoneybadgerClient(String apiKey, String excludedSysProps, String excludedExceptionClasses) {
+    public HoneybadgerClient(String apiKey, String excludedSysProps, String excludedExceptionClasses, String excludedExceptionCauses) {
         this.apiKey = apiKey;
-        this.excludedExceptionClasses = buildExcludedExceptionClasses(excludedExceptionClasses);
+        this.excludedExceptionClasses = buildExcludedClasses(excludedExceptionClasses);
+        this.excludedExceptionCauses = buildExcludedCauses(excludedExceptionCauses);
 
         this.marshaller = new JsonMarshaller(buildExcludedSysProps(excludedSysProps));
     }
@@ -204,17 +217,25 @@ public class HoneybadgerClient {
      * @param error
      * @return
      */
-    private boolean shouldExclude(Throwable error){
+    protected boolean shouldExclude(Throwable error){
 
         if (error == null){
             return false;
         }
 
         String errorClassName = error.getClass().getName();
-
-        if (errorClassName != null){
+        if (!isNullOrEmpty(errorClassName)){
             for (String className : excludedExceptionClasses){
                 if (errorClassName.startsWith(className)){
+                    return true;
+                }
+            }
+        }
+
+        StackTraceElement[] stackTraceElements = error.getStackTrace();
+        if (stackTraceElements != null && stackTraceElements.length > 0) {
+            for (String className : excludedExceptionCauses) {
+                if (stackTraceElements[0].getClassName().startsWith(className)) {
                     return true;
                 }
             }
@@ -313,23 +334,23 @@ public class HoneybadgerClient {
         set.add(HONEYBADGER_EXCLUDED_PROPS_SYS_PROP_KEY);
         set.add(HONEYBADGER_URL_SYS_PROP_KEY);
 
-        if (excluded == null || excluded.isEmpty()) {
-            return set;
-        }
-
-        for (String item : excluded.split(",")) {
-            set.add(item);
-        }
-
-        return set;
+        return buildExcluded(set, excluded);
     }
 
-    private Set<String> buildExcludedExceptionClasses(String excluded) {
+    private Set<String> buildExcludedClasses(String excluded) {
         HashSet<String> set = new HashSet<>();
-
         set.add(HoneybadgerException.class.getCanonicalName());
+        return buildExcluded(set, excluded);
+    }
 
-        if (excluded == null || excluded.isEmpty()) {
+    private Set<String> buildExcludedCauses(String excluded) {
+        HashSet<String> set = new HashSet<>();
+        return buildExcluded(set, excluded);
+    }
+
+    private Set<String> buildExcluded(Set<String>set, String excluded) {
+
+        if (isNullOrEmpty(excluded)) {
             return set;
         }
 
@@ -375,5 +396,8 @@ public class HoneybadgerClient {
         }
     }
 
+    private boolean isNullOrEmpty(String string) {
+        return string == null || string.trim().isEmpty();
+    }
 
 }
