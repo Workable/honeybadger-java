@@ -128,6 +128,19 @@ public class HoneybadgerClient {
      *                                 dispatched
      * @param excludedExceptionClasses Comma delimited list of Exceptions that should be ignored
      */
+    public HoneybadgerClient(String apiKey, String excludedSysProps, String excludedExceptionClasses) {
+        this(apiKey, excludedSysProps, excludedExceptionClasses, null);
+    }
+
+    /**
+     * Constructs a Client with specific options
+     *
+     * @param apiKey                   The Honeybadger API Key
+     * @param excludedSysProps         Comma delimited list of System properties that should be excluded from errors
+     *                                 dispatched
+     * @param excludedExceptionClasses Comma delimited list of Exceptions that should be ignored
+     * @param excludedExceptionCauses  Comma delimited list of packages or classes that throw exceptions to ignore
+     */
     public HoneybadgerClient(String apiKey, String excludedSysProps, String excludedExceptionClasses, String excludedExceptionCauses) {
         this.apiKey = apiKey;
         this.excludedExceptionClasses = buildExcludedClasses(excludedExceptionClasses);
@@ -232,11 +245,13 @@ public class HoneybadgerClient {
             }
         }
 
-        StackTraceElement[] stackTraceElements = error.getStackTrace();
-        if (stackTraceElements != null && stackTraceElements.length > 0) {
-            for (String className : excludedExceptionCauses) {
-                if (stackTraceElements[0].getClassName().startsWith(className)) {
-                    return true;
+        if (!excludedExceptionCauses.isEmpty()) {
+            StackTraceElement[] stackTraceElements = error.getStackTrace();
+            if (stackTraceElements != null && stackTraceElements.length > 0) {
+                for (String className : excludedExceptionCauses) {
+                    if (stackTraceElements[0].getClassName().startsWith(className)) {
+                        return true;
+                    }
                 }
             }
         }
