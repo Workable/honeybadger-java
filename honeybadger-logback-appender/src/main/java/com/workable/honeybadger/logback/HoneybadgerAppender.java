@@ -1,12 +1,13 @@
 package com.workable.honeybadger.logback;
 
+import com.workable.honeybadger.Error;
+import com.workable.honeybadger.HoneybadgerClient;
+
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.classic.spi.StackTraceElementProxy;
 import ch.qos.logback.classic.spi.ThrowableProxy;
 import ch.qos.logback.core.AppenderBase;
-import com.workable.honeybadger.Error;
-import com.workable.honeybadger.HoneybadgerClient;
 
 
 /**
@@ -33,6 +34,11 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
      * Comma delimited list of Exceptions that should be ignored
      */
     private String ignoredExceptions;
+
+    /**
+     * Comma delimited list of classes or packages that cause Exceptions that should be ignored
+     */
+    private String ignoredCauses;
 
     /**
      * If <code>true</code> erros are dispatched asynchronously (Default true)
@@ -63,11 +69,12 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
     /**
      * Creates an instance of HoneybadgerAppender.
      */
-    public HoneybadgerAppender(HoneybadgerClient client, String apiKey, String ignoredExceptions, String ignoredSystemProperties,
-                               boolean async, int maxThreads, int priority, int queueSize) {
+    public HoneybadgerAppender(HoneybadgerClient client, String apiKey, String ignoredExceptions, String ignoredCauses,
+                               String ignoredSystemProperties, boolean async, int maxThreads, int priority, int queueSize) {
         this.client = client;
         this.apiKey = apiKey;
         this.ignoredExceptions = ignoredExceptions;
+        this.ignoredCauses = ignoredCauses;
         this.ignoredSystemProperties = ignoredSystemProperties;
         this.async = async;
         this.maxThreads = maxThreads;
@@ -105,7 +112,7 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
     protected synchronized void initHoneybadger() {
         try {
             if (client == null) {
-                client = new HoneybadgerClient(apiKey, ignoredSystemProperties, ignoredExceptions);
+                client = new HoneybadgerClient(apiKey, ignoredSystemProperties, ignoredExceptions, ignoredCauses);
                 client.setAsync(async);
                 client.setMaxThreads(maxThreads);
                 client.setPriority(priority);
@@ -144,6 +151,10 @@ public class HoneybadgerAppender extends AppenderBase<ILoggingEvent> {
 
     public void setIgnoredExceptions(String ignoredExceptions) {
         this.ignoredExceptions = ignoredExceptions;
+    }
+
+    public void setIgnoredCauses(String ignoredCauses) {
+        this.ignoredCauses = ignoredCauses;
     }
 
     public void setAsync(boolean async) {

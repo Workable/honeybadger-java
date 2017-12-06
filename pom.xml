@@ -46,6 +46,7 @@
 
     <properties>
         <org.glassfish.jersey.version>2.3.1</org.glassfish.jersey.version>
+        <org.codehaus.mojo.versions-maven-plugin.version>2.5</org.codehaus.mojo.versions-maven-plugin.version>
     </properties>
 
     <profiles>
@@ -128,10 +129,12 @@
                     <target>1.7</target>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>${org.codehaus.mojo.versions-maven-plugin.version}</version>
+            </plugin>
         </plugins>
     </build>
-
-
-
 
 </project>
